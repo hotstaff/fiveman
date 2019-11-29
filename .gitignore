@@ -1,0 +1,16 @@
+node_modules/
+public/bundle.js
+public/bundle.js.map
+!public/fonts/
+public/css/*
+public/js/*
+!public/js/index.js
+!public/js/leastsquare.js
+public/css/*
+!public/css/style.css
+node/ssl.key
+node/ssl.crt
+node/ssl.csr
+
+!book/
+!logs/

@@ -1,0 +1,62 @@
+{
+  "name": "fiveman",
+  "version": "1.5.0",
+  "description": "Real-time kakeibo.",
+  "main": "js/index.js",
+  "dependencies": {
+    "Umi": "github:ysakasin/Umi#v3.3.7-2",
+    "compression": "^1.6.2",
+    "config": "^2.0.1",
+    "del": "^3.0.0",
+    "devbridge-autocomplete": "^1.4.1",
+    "express": "^4.15.3",
+    "flatpickr": "3.0.6",
+    "forever": "^0.15.3",
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^3.9.4",
+    "gulp-download-stream": "0.0.19",
+    "gulp-rename": "^1.2.3",
+    "gulp-uglify": "^3.0.0",
+    "jquery": "^3.2.1",
+    "jquery.fft": "^1.0.3",
+    "js-cookie": "^2.1.4",
+    "jsondiffpatch": "^0.2.4",
+    "pnotify": "3.2.0",
+    "run-sequence": "^2.2.1",
+    "sifter": "^0.5.2",
+    "smartwizard": "4.2.2",
+    "socket.io": "^1.7.4",
+    "socket.io-client": "^2.0.4",
+    "uuid": "^3.2.1",
+    "xxhashjs": "^0.2.1"
+  },
+  "devDependencies": {
+    "css-loader": "^0.28.0",
+    "expose-loader": "^0.7.3",
+    "file-loader": "^0.11.1",
+    "imports-loader": "^0.7.1",
+    "style-loader": "^0.16.1",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "url-loader": "^0.5.8",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "readme": "ERROR: No README data found!",
+  "scripts": {
+    "postinstall": "gulp",
+    "test": "NODE_ENV=standalone node node/familydesk.js",
+    "start": "NODE_ENV=standalone forever start --minUptime 1000 --spinSleepTime 1000 -o logs/familydesk.log node/familydesk.js ",
+    "start-with-ssl": "NODE_ENV=standalone-with-ssl forever start --minUptime 1000 --spinSleepTime 1000 -o logs/familydesk.log node/familydesk.js",
+    "start-without-express": "forever start --minUptime 1000 --spinSleepTime 1000 -o logs/familydesk.log node/familydesk.js",
+    "stop": "forever stop node/familydesk.js",
+    "build-test": "webpack --devtool source-map",
+    "build": "webpack -p --optimize-minimize --profile"
+  },
+  "keywords": [
+    "kakeibo",
+    "socket-io",
+    "bootstrap"
+  ],
+  "author": "Hideto Manjo <enjinit@gmail.com>",
+  "license": "SEE LICENSE IN public/js/index.js"
+}

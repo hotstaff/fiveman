@@ -1,0 +1,117 @@
+body {
+    padding-top: 90px;
+}
+
+@media ( min-width: 768px) {
+    #banner {
+        min-height: 300px;
+        border-bottom: none;
+    }
+    .bs-docs-section {
+        margin-top: 8em;
+    }
+    .bs-component {
+        position: relative;
+    }
+    .bs-component .modal {
+        position: relative;
+        top: auto;
+        right: auto;
+        left: auto;
+        bottom: auto;
+        z-index: 1;
+        display: block;
+    }
+    .bs-component .modal-dialog {
+        width: 95%;
+    }
+    .bs-component .popover {
+        position: relative;
+        display: inline-block;
+        width: 220px;
+        margin: 20px;
+    }
+    .nav-tabs {
+        margin-bottom: 15px;
+    }
+    .progress {
+        margin-bottom: 10px;
+    }
+}
+
+.navbar-inverse {
+    background-color: #0007a8;
+}
+
+input[readonly].calender-input {
+    background-color: #ffffff;
+    cursor: default;
+}
+
+.autocomplete-suggestions {
+    border: 1px solid #999;
+    background: #FFF;
+    overflow: auto;
+}
+
+.autocomplete-suggestion {
+    padding: 2px 5px 2px 17px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.autocomplete-selected {
+    background: #F0F0F0;
+}
+
+.autocomplete-suggestions strong {
+    font-weight: normal;
+    color: #3399FF;
+}
+
+.autocomplete-group {
+    padding: 2px 5px;
+    font-weight: bold;
+}
+
+.autocomplete-group strong {
+    display: block;
+    border-bottom: 1px solid #000;
+}
+.wizard-item-button {
+    white-space: normal;
+}
+
+/*disable spin-button of price*/
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance:textfield;
+}
+
+/*
+"Cleaner List Group with Hidden Sub-menu"
+is cited from 
+https://bootsnipp.com/snippets/featured/cleaner-list-group-with-hidden-sub-menu.
+*/
+
+
+
+/*
+.modal-dialog {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.modal-content {
+  height: auto;
+  min-height: 100%;
+  border-radius: 0;
+}
+*/

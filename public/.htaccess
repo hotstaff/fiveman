@@ -1,0 +1,24 @@
+#
+FileETag MTime
+
+
+#MIME type
+AddType application/x-font-ttf .ttf
+AddType application/x-font-woff .woff
+Addtype application/json .json
+
+# CACHE media files
+<ifModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 seconds"
+  ExpiresByType image/png "access plus 1 months"
+  ExpiresByType image/jpeg "access plus 1 months"
+  ExpiresByType image/gif "access plus 1 months"
+  ExpiresByType image/x-icon "access plus 1 months"
+  ExpiresByType application/x-font-ttf "access plus 1 months"
+  ExpiresByType application/x-font-woff "access plus 1 months"
+  ExpiresByType application/x-javascript "access plus 1 months"
+  ExpiresByType application/json "access plus 1 days"
+  ExpiresByType text/javascript "access plus 1 months"
+  ExpiresByType text/css "access plus 1 months"
+</ifModule>

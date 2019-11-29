@@ -1,0 +1,741 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<!-- Realtime-Kakeibo Fiveman is created by Hideto Manjo
+  Licence:Verbatim copying only about comment text on source
+  This program works on node.js. write: 2016/12/22-->
+<script>
+/*jslint browser : true */
+"use strict";
+console.time("html");
+</script>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex" />
+<!-- icons -->
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="icons/favicon-16x16.png" sizes="16x16">
+<link rel="manifest" href="icons/manifest.json">
+<link rel="mask-icon" href="icons/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="theme-color" content="#183dbc">
+<!-- bootstrap config -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=0.9">
+<!-- stylesheets -->
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" media="all" href="css/pnotify.min.css" />
+<link rel="stylesheet" media="all" href="css/pnotify.buttons.min.css" />
+<link rel="stylesheet" media="all" href="css/pnotify.brighttheme.min.css" />
+<link rel="stylesheet" href="css/flatpickr.min.css">
+<link rel="stylesheet" href="css/smart_wizard.min.css">
+<link rel="stylesheet" href="css/smart_wizard_theme_arrows.min.css">
+
+<link rel="stylesheet" media="screen,print" href="css/style.css" />
+<!-- the script places before end of body tag -->
+<title>リアルタイム家計簿　ファイブマン</title>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand">
+        <strong>
+          <span class="hidden-xs hidden-sm">リアル<span id="brand-time">タイム</span>家計簿</span>
+          <span class="text-danger">
+            <span id="title-fa">ファ</span><span id="title-i">イ</span><span id="title-bu">ブ</span><span id="title-ma">マ</span><span id="title-n">ン</span>
+          </span>
+        </strong>
+      </a>
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="sr-only">メニュー</span>
+        <span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </span>
+      </button>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+    <ul class="nav navbar-nav ">
+    <li class="dropdown">
+      <a href="#" class=" dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-th-list"></span> メニュー<span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        <li id="wizardpencil" class="invisible">
+        <a data-toggle="modal" data-target="#wizard" style="cursor: pointer;"><span class="glyphicon glyphicon-pencil"></span> タッチで選択して入力</a></li>
+        <li id="navpencil" class="invisible">
+        <a data-toggle="modal" data-target="#modalinput" style="cursor: pointer;"><span class="glyphicon glyphicon-pencil"></span> フォームから入力</a></li>
+        <li role="separator" class="divider"></li>
+        <li>
+          <div class="navbar-form">
+            <div id="navsearch" class="input-group">
+              <input type="text" id="searchinput" class="form-control" placeholder="検索">
+              <div class="input-group-btn">
+                <button class="btn btn-default" type="button" id="buttonsearch"><span class="glyphicon glyphicon-search"></span></button>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li role="separator" class="divider"></li>
+
+        <!-- <li role="separator" class="divider"></li>
+        <li>
+          <a href="#"><span class="glyphicon glyphicon-comment"></span> チャットとログ</a>
+        </li> -->
+        
+        <li class="dropdown-header">操作</li>
+        <li role="separator" class="divider"></li>
+        <!-- <li class="dropdown-header">設定</li>
+        <li><a href="#">ユーザー名</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a href="#">ヘルプ</a></li> -->
+      </ul>
+    </li>
+    <li><a href="#" id="defaultview" class="hidden"><span class="glyphicon glyphicon-remove"></span>検索を終了する</a></li>
+    </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+            <a href="#" id=pencilstatus title="鉛筆" data-toggle="modal" data-target="#wizard"  class="hidden">
+              <span id="pencilstatusicon" class="glyphicon glyphicon-pencil"></span>
+              <p class="visible-xs-inline"> 家計簿をつける</p>
+            </a>
+        </li>
+        <li>
+            <a href="#" id=chatstatus title="最新のメッセージ" data-toggle="popover" data-html="true" data-trigger="focus" data-placement="left" data-content="内容">
+              <span id="chatstatusicon" class="glyphicon glyphicon-comment"></span>
+              <span id='messagenumber' class='badge hidden'></span>
+              <p class="visible-xs-inline"> メッセージ</p>
+            </a>
+        </li>
+        
+        <li>
+            <a href="#" id=connectionstatus title="接続状態" data-toggle="popover" data-html="true" data-trigger="focus" data-placement="left" data-content="未接続">
+              <span id="connectionstatusicon" class="glyphicon glyphicon-hdd"></span>
+              <span id='retrynumber' class='badge hidden'></span> 
+              <p class="visible-xs-inline"> 未接続</p>
+            </a>
+        </li>
+      </ul>
+    
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="note">
+    <div id="modal_alert" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 id="modal_alert_title" class="modal-title" >アラート</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+              <div id="modal_alert_body">
+              </div>
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#tabchartline" data-toggle="tab" id="chartline"><span class="glyphicon glyphicon-stats"></span>収支</a>
+          <li><a href="#tabchartpie" data-toggle="tab" id="chartpie"><span class="glyphicon glyphicon-stats"></span>支出内訳</a>
+          <li><a href="#tabjoho" data-toggle="tab" id="joho"><span class="glyphicon glyphicon-book"></span>情報</a>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane in active" id="tabchartline">
+            <div class="center-block align-middle" id="chartContainerline" style=" height:335px;"></div>
+            <ul id="graphinfo" class="list-group">
+              <li class="list-group-item">
+                <div class="checkbox-inline">
+                  <label>
+                    <input id="graphinfoyosoku" type="checkbox">予測ライン</label>
+                </div>
+                <div class="checkbox-inline">
+                  <label>
+                    <input id="graphinfoimpose" type="checkbox">重ね合わせ</label>
+                </div>
+                <div class="checkbox-inline">
+                  <label>
+                    <input id="graphinfofft" type="checkbox">周期解析</label>
+                </div>              
+            </ul>
+          </div>
+          <div class="tab-pane" id="tabchartpie">
+            <div class="center-block align-middle" id="chartContainerpie" style=" height:335px;"></div>
+            <ul id="piechartinfo" class="list-group">
+              <li class="list-group-item">
+                <div class="checkbox-inline">
+                  <label>
+                    <input id="piechartinfostack" type="checkbox">月ごとに集計</label>
+                </div>
+            </ul>
+          </div>
+          <div class="tab-pane " id="tabjoho">
+            <div class="panel-group" id="accordion">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapserepository">リポジトリ</a>
+                  </h4>
+                </div>
+                <div id="collapserepository" class="panel-collapse collapse in">
+                  <div class="panel-body">
+                    <ul class="list-group" id="johorepositorylist">
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapsenotebook">ノートブック</a>
+                  </h4>
+                </div>
+                <div id="collapsenotebook" class="panel-collapse collapse">
+                  <ul class="list-group">
+                    <li class="list-group-item hidden">家計簿タイトル:
+                      <span id="johotitle"></span>
+                    <li class="list-group-item hidden">作者:
+                      <span id="johoauthor"></span>
+                    <li class="list-group-item">テーブル:
+                      <span id="johotablerow"></span>行
+                    <li class="list-group-item">月の始まり:
+                      <span id="johorefdate"></span>日
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="panel panel-primary">
+              <div class="panel-heading lead">
+                <span id="tsukaeruokanelabel">使えるお金</span>
+              </div>
+              <div class="panel-body text-center h2">
+                <span id="tsukaeruokane"></span>
+              </div>
+              <ul class="list-group">
+                <li class="list-group-item">
+                  一日あたり:<span  id="tsukaeruokanebyday"></span>
+              </ul>
+            </div>
+            <div class="input-group">
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default" id="buttonprevious"><span class="glyphicon glyphicon-chevron-left"></span></button>
+              </div>
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default" id="buttonnext"><span class="glyphicon glyphicon-chevron-right"></span></button>
+              </div>
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-calendar"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" id="buttonall">すべて</a>
+                </ul>
+              </div>
+              <input type="text" id="kikan" class="form-control calender-input">
+            </div>
+            <div class="btn-group btn-group-justified">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default active  disabled" id="buttonkongetsu">今月分</button>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-default disabled" id="buttonraigetsu">来月分</button>
+              </div>
+            </div>
+            <div class="btn-group btn-group-justified">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default disabled" id="buttonlastmonth">今月分(予定なし)</button>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-default disabled" id="buttonlastweek">最近一週間</button>
+              </div>
+            </div>
+            <div class="btn-group btn-group-justified">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default disabled" id="buttonpast">今日まで</button>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-default disabled" id="buttonfuture">予定分</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="panel panel-default">
+              <div class="panel-heading">支出</div>
+              <ul class="list-group">
+                <li class="list-group-item text-info">消費 :
+                  <span id="goukeiconsumer"></span>
+                <li class="list-group-item text-warning">投資 :
+                  <span id="goukeiinvestment"></span>
+                <li class="list-group-item text-danger">浪費 :
+                  <span id="goukeiwaste"></span>
+                <li class="list-group-item ">合計 :
+                  <span id="goukeioutcome"></span>
+              </ul>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">収入と貯蓄</div>
+              <ul class="list-group">
+                <li class="list-group-item">収入 :
+                  <span id="goukeiincome"></span>
+                <li class="list-group-item text-success">貯蓄 :
+                  <span  id="goukeisavings"></span>
+              </ul>
+            </div>
+          </div>
+        </div>
+        支出内訳
+        <div class="progress">
+          <div class="progress-bar progress-bar-info" role="progressbar" id="progressconsumer" style="width:85%">
+            消費
+            <span id="rateconsumer"></span>
+          </div>
+          <div class="progress-bar progress-bar-warning" role="progressbar" id="progressinvestment" style="width:10%">
+            投資
+            <span id="rateinvestment"></span>
+          </div>
+          <div class="progress-bar progress-bar-danger" role="progressbar" id="progresswaste" style="width:5%">
+            浪費
+            <span id="ratewaste"></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="row">
+          <div class="modal fade" id="modalinput" tabindex="-1" role="dialog" aria-labelledby="modaltitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                  </button>
+                  <h4 class="modal-title" id="modaltitle">家計簿入力フォーム</h4>
+                </div>
+                <div class="modal-body">
+                  <form class="form-horizontal">
+                    <div class="form-group">
+                      <label class="col-sm-3 control-label" for="modal_item">品名 <span class="label label-danger">必須</span></label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" id="modal_item" placeholder="食材">
+                        <small class="form-text text-muted">品名を入力すると過去のデータが自動入力されます.</small>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-3 control-label" for="modal_category">カテゴリ <span class="label label-success">選択</span></label>
+                      <div class="col-sm-9">
+                        <select class="form-control" id="modal_category">
+                          <optgroup id="modal_group-outgo" label="支出">
+                            <option selected>食料品</option>
+                            <option>日用雑貨</option>
+                            <option>交通</option>
+                            <option>交際費</option>
+                            <option>ホビー</option>
+                            <option>教育・教養</option>
+                            <option>ファッション</option>
+                            <option>医療</option>
+                            <option>通信</option>
+                            <option>水道・光熱費</option>
+                            <option>住まい</option>
+                            <option>車</option>
+                            <option>税金</option>
+                            <option>大きな支出</option>
+                            <option>その他</option>               
+                          <optgroup id="modal_group-income" label="収入">
+                            <option>給料</option>
+                            <option>臨時収入</option>
+                            <option>預金引出</option>
+                          <optgroup id="modal_group-savings" label="貯蓄">
+                            <option>預金預入</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-3 control-label" for="modal_price">税込金額 <span class="label label-danger">必須</span></label>
+                      <div class="col-sm-9">
+                        <div class="input-group">
+                          <input type="number" class="form-control" id="modal_price" placeholder="500">
+                          <div class="input-group-addon">円</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div id="modal_inputformprice2" class="hidden">
+                        <label id="modal_price2label" class="col-sm-3 control-label" for="modal_price2"></label>
+                        <div class="col-sm-9">
+                          <div class="input-group">
+                            <input type="number" class="form-control" id="modal_price2" placeholder="1">
+                            <div class="input-group-addon">
+                              <div id="modal_price2unit">L</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-3 control-label" for="modal_radioincome"><span class="label label-success">選択</span></label>
+                      <div class="col-sm-9">
+                        <div class="radio-inline">
+                          <label>
+                            <input type="radio" id="modal_radioincome" name="modal_producttype" value="income"> 収入
+                          </label>
+                        </div>
+                        <div class="radio-inline">
+                          <label>
+                            <input type="radio" id="modal_radiosavings" name="modal_producttype" value="savings"> 貯蓄
+                          </label>
+                        </div>
+                        <div class="radio-inline">
+                          <label>
+                            <input type="radio" id="modal_radioconsumer" name="modal_producttype" value="consumer" checked> 消費
+                          </label>
+                        </div>
+                        <div class="radio-inline">
+                          <label>
+                            <input type="radio" id="modal_radioinvestment" name="modal_producttype" value="investment"> 投資
+                          </label>
+                        </div>
+                        <div class="radio-inline">
+                          <label>
+                            <input type="radio" id="modal_radiowaste" name="modal_producttype" value="waste"> 浪費
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-3 control-label" for="modal_date">日付 <span class="label label-danger">必須</span></label>
+                      <div class="col-sm-9">
+                        <div class="input-group">
+                          <input type="date" class="form-control" id="modal_date">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-3 control-label" for="modal_memo">メモ <span class="label label-default">任意</span></label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" id="modal_memo" placeholder="日時など">
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 閉じる</button>
+                  <button id="modal_submit" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-send"></span> 家計簿へ追加</button>
+                  <button id="modal_edit" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> 変更する</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="wizard" tabindex="-1" role="dialog" aria-labelledby="modaltitle" aria-hidden="true">
+            <div class="modal-dialog  modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&#215;</span><span class="sr-only">閉じる</span>
+                  </button>
+                  <h3 class="modal-title"><span id="wizardsteptitle">タッチパネル入力</span></h3>
+                </div>
+                <div class="modal-body">
+                  <div id="smartwizard">
+                    <ul class="hidden-xs">
+                        <li><a href="#step-1">STEP 1<br /><small>品名の入力</small></a></li>
+                        <li><a href="#step-2">STEP 2<br /><small>支出タイプの選択</small></a></li>
+                        <li><a href="#step-3">STEP 3<br /><small>金額の入力</small></a></li>
+                        <li><a href="#step-4">STEP 4<br /><small>日付の入力</small></a></li>
+                        <li><a href="#step-5">STEP 5<br /><small>送信内容確認</small></a></li>
+                    </ul>
+                    <div>
+                      <div id="step-1">
+                        <!-- <h2>カテゴリ・品名を選択</h2> -->
+                        <ul id="wizardcategorypills" class="nav nav-pills">
+                        </ul>
+                          <a type="button" id="wizarditemprevious" class="btn btn-default pull-left btn-lg disabled">
+                          <span class="glyphicon glyphicon-menu-left"></span> 前へ
+                          </a>
+                          <a type="button" id="wizardnewitemtabopen" class="btn btn-default btn-lg">
+                          <span class="glyphicon glyphicon-plus"></span> 検索と追加
+                          </a>
+                          <a type="button" id="wizardnewitemtabclose" class="btn btn-default btn-lg hidden">
+                          <span class="glyphicon glyphicon-list"></span> リストから選択
+                          </a>
+                          <a type="button" id="wizarditemnext" class="btn btn-default pull-right btn-lg">
+                          <span class="glyphicon glyphicon-menu-right"></span> 次へ
+                          </a>
+                          <div id="wizardcategorytabs" class="tab-content">
+                          </div>
+                          <ol id="wizardcategorypage" class="text-right breadcrumb">
+                            <li class="breadcrumb-item active" id="wizardcategorypagenumber">1</li>
+                            <li class="breadcrumb-item" id="wizardcategorypagetotal">1</li>
+                          </ol>
+                          <div id="wizardnewitemtab" class="hidden" >
+                              <div class="input-group input-group-lg">
+                                <span class="input-group-addon" id="wizardnewitemaddon">カテゴリ</span>
+                                <input type="text" class="form-control" placeholder="検索または追加する品名" id="wizardnewitem" aria-describedby="wizardnewitemaddon">
+                              </div>
+                              <div id="wizardnewitembuttons">
+                            </div>
+                              <button class="btn btn-primary btn-lg btn-block hidden" id="wizardnewitemnext" type="button">次へ</button>
+                          </div>
+                      </div>
+                      <div id="step-2">
+                        <!-- <h2>支出タイプを選択</h2> -->
+                        <div class="btn-group btn-group-lg btn-group-justified">
+                          <a class="btn btn-info wizard-producttype-button" type="button" rel="consumer" id="wizardbuttonconsumer">消費</a>
+                          <a class="btn btn-warning wizard-producttype-button" type="button" rel="investment" id="wizardbuttoninvestment">投資</a>
+                          <a class="btn btn-danger wizard-producttype-button" type="button" rel="waste" id="wizardbuttonwaste">浪費</a>
+                        </div>                     
+                      </div>
+                      <div id="step-3">
+                        <!-- <h2>金額を入力</h2> -->
+                        <div class="input-group input-group-lg">
+                          <input type="number" class="form-control" id="wizardprice" placeholder="500">
+                          <div class="input-group-addon">円</div>
+                        </div>
+                        <div id="wizardpricebuttons">
+                        </div>
+                        <div id="wizardinputformprice2" class="hidden input-group input-group-lg">
+                          <div class="input-group-addon" id="wizardprice2label">追加入力</div>
+                          <input type="number" class="form-control" id="wizardprice2" placeholder="1">
+                          <div class="input-group-addon" id="wizardprice2unit">円</div>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg btn-block hidden" id="wizardpricenext" type="button">次へ</button>
+                      </div>
+                      <div id="step-4">
+                        <!-- <h2>日付を選択</h2> -->
+                        <div class="row">
+                          <div class="col-md-7">
+                            <div class="btn-group btn-group-lg btn-group-justified ">
+                              <a class="btn btn-default" id="wizardkinou" type="button">昨日</a>
+                              <a class="btn btn-primary" id="wizardkyou" type="button">今日</a>
+                            </div>
+                          </div>
+                          <div class="col-md-5">
+                            <div class="form-group">
+                              <button class="btn btn-default btn-lg btn-block" data-toggle="collapse" data-target="#wizardcalendar"><span class="glyphicon glyphicon-calendar"></span> カレンダーから選択</button>
+                            </div>
+                            <div id="wizardcalendar" class="collapse">
+                              <div class="form-group">
+                                  <input class="hidden form-control" type="text" id="wizarddatepicker">
+                                  <button class="btn btn-success btn-lg btn-block" id="wizardshitei" type="button">カレンダーで指定した日を使う</button>
+                              </div>
+                            </div>
+                          </div>    
+                        </div>
+                      </div>
+                      <div id="step-5">
+                        <div class="panel panel-default">
+                          <div class="panel-heading">家計簿に新しく追加する情報</div>
+                          <table class="table">
+                            <tbody>
+                              <tr> <th>品名:</th> <td><span id="wizardconfirmitem"></span></td> </tr>
+                              <tr> <th>カテゴリ:</th> <td><span id="wizardconfirmcategory"></span></td> </tr>
+                              <tr> <th>支出タイプ:</th> <td><span id="wizardconfirmproducttype"></span></td> </tr>
+                              <tr> <th>税込金額:</th> <td><span id="wizardconfirmprice"></span>円</td> </tr>
+                              <tr> <th>日付:</th> <td><span id="wizardconfirmdate"></span></td> </tr>
+                              <tr> <th>メモ:</th> <td><input type="text" class="form-control" placeholder="日時など" id="wizardmemo"></input></td> </tr>
+                            </tbody>
+                          </table>
+                          <a class="btn btn-primary btn-lg btn-block" id="wizardsubmit" type="button"><span class="glyphicon glyphicon-send"></span> この内容で送信する</a>
+                          <a class="btn btn-default btn-lg btn-block" id="wizardrestart" type="button"><span class="glyphicon glyphicon-refresh"></span> 初めからやり直す</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-9 hidden-xs">
+            <div id="pencil" class="form-group hidden">
+              <div class="btn-group">
+                <input class="btn btn-default btn-lg disabled" id="kinou" type="button" value="昨日" />
+                <input class="btn btn-primary btn-lg disabled" id="kyou" type="button" value="今日" />
+                <input class="btn btn-default btn-lg disabled" id="ashita" type="button" value="明日" />
+                <input class="btn btn-default btn-lg disabled" data-toggle="tooltip" title="カレンダーで選択した日付で書き込みます。" id="shitei" type="button" value="日付指定" />
+              </div>
+              <button type="button" class="btn btn-default btn-lg disabled" data-toggle="tooltip" title="変更を取り消します。" id="undo">
+                <span class="glyphicon glyphicon-repeat"></span> 入力取り消し
+              </button>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="panel panel-default">
+              <div class="panel-body">
+                <div class="checkbox-inline">
+                  <label>
+                    <input id="limitedkikan" type="checkbox" checked>集計期間のみ表示</label>
+                </div>
+                <div class="checkbox-inline">
+                <label>
+                    <input id="lightlisttoggle" type="checkbox">簡易リスト表示</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive col-md-12 col-12 col-sm-12 col-xs-12 col-lg-12">
+        <table id="table" class="table table-condensed table-hover">
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th id="buttonitem">品名<span id="thitemicon" class="glyphicon"></span></th>
+              <th id="buttoncategory">カテゴリ<span id="thcategoryicon" class="glyphicon glyphicon-sort"></span></th>
+              <th id="buttonprice">税込金額<span id="thpriceicon" class="glyphicon"></span></th>
+              <th id="buttonincome">収入<span id="thincomeicon" class="glyphicon"></span></th>
+              <th id="buttonsavings">貯蓄<span id="thsavingsicon" class="glyphicon"></span></th>
+              <th id="buttonconsumer">消費<span id="thconsumericon" class="glyphicon"></span></th>
+              <th id="buttoninvestment">投資<span id="thinvestmenticon" class="glyphicon"></span></th>
+              <th id="buttonwaste">浪費<span id="thwasteicon" class="glyphicon "></span></th>
+              <th>メモ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="input-row">
+              <td>
+                <div class="form-group">
+                  <div class="input-group" style="width:110px">
+                    <input type="text" class="form-control calender-input" id="datepicker">
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="form-group">
+                  <div class="input-group" id="inputformitem">
+                    <label class="sr-only" for="item">品名</label>
+                    <input id="item" type="text" class="form-control" placeholder="食材" maxlength="20" autocomplete="off" required aria-required="true">
+                  </div>
+                </div>
+              </td>
+              <td>
+                <select id="category" class="form-control" style="width:90px">
+                  <optgroup id="group-outgo" label="支出">
+                    <option selected>食料品</option>
+                    <option>日用雑貨</option>
+                    <option>交通</option>
+                    <option>交際費</option>
+                    <option>ホビー</option>
+                    <option>教育・教養</option>
+                    <option>ファッション</option>
+                    <option>医療</option>
+                    <option>通信</option>
+                    <option>水道・光熱費</option>
+                    <option>住まい</option>
+                    <option>車</option>
+                    <option>税金</option>
+                    <option>大きな支出</option>
+                    <option>その他</option>
+                  <optgroup id="group-income" label="収入">
+                    <option>給料</option>
+                    <option>臨時収入</option>
+                    <option>預金引出</option>
+                  <optgroup id="group-savings" label="貯蓄">
+                    <option>預金預入</option>
+                </select>
+              </td>
+              <td>
+                <div class="form-group">
+                  <label class="sr-only" for="price">Amount</label>
+                  <div class="input-group" id="inputformprice" style="width:140px">
+                    <input id="price" class="form-control" type="number" placeholder="500" min="0" required aria-required="true">
+                    <div class="input-group-addon">円</div>
+                  </div>
+                  <label id="price2label" class="hidden" for="price2"></label>
+                  <div class="input-group hidden" id="inputformprice2" style="width:140px">
+                    <input id="price2" class="form-control" type="number" placeholder="1" min="0">
+                    <div class="input-group-addon">
+                      <span id="price2unit">L</span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <input type="radio" name="producttype" value="income" id="radioincome" class="form-control hidden" />
+                <label for="radioincome" class="radio"></label>
+              </td>
+              <td>
+                <input type="radio" name="producttype" value="savings" id="radiosavings" class="form-control hidden" />
+                <label for="radiosavings" class="radio"></label>
+              </td>
+              <td>
+                <input type="radio" name="producttype" value="consumer" id="radioconsumer" class="form-control" checked />
+                <label for="radioconsumer" class="radio"></label>
+              </td>
+              <td>
+                <input type="radio" name="producttype" value="investment" id="radioinvestment" class="form-control" />
+                <label for="radioinvestment" class="radio"></label>
+              </td>
+              <td>
+                <input type="radio" name="producttype" value="waste" id="radiowaste" class="form-control" />
+                <label for="radiowaste" class="radio"></label>
+              </td>
+              <td>
+                <div class="form-group">
+                  <div class="input-group">
+                    <label class="sr-only" for="memo">メモ</label>
+                    <input id="memo" class="form-control" placeholder="日時など" type="text" data-toggle="tooltip" data-trigger="manual" data-placement="top" />
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-12">
+      <ul id="lightlist" class="list-group row">
+      </ul>
+      </div>
+    </div>    
+  </div>
+  <div class="chatblock col-md-7">
+      <div class="panel panel-default">
+        <div class="panel-heading">チャット(ID:<span id = "userid" >ident</span>>)</div>
+        <div class="panel-body">
+           <div class="form-group">
+            <div class="input-group">
+              <input class="form-control" id="msg" type="text">
+              <span id="send" type="button" value="send" class="input-group-addon">送信
+              </span>
+            </div>
+            <label class="sr-only" for="log">ログ</label>
+            <textarea class="form-control" rows="5" id="log"></textarea>
+          </div> 
+        </div>
+      </div>
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="text-muted">Real-time Kakeibo Fiveman.</p>
+  </div>
+</footer>
+<!-- libs -->
+<script src="js/jquery.min.js"></script>
+<script src="js/canvasjs.min.js"></script>  <!-- 1.70 -->
+
+<script src="js/socket.io.min.js"></script>
+<script src="js/js.cookie.min.js"></script>
+<script src="js/flatpickr.min.js"></script>
+<script src="js/ja.min.js"></script>
+<script src="js/pnotify.min.js"></script>
+<script src="js/pnotify.confirm.min.js"></script>
+<script src="js/jquery.autocomplete.min.js"></script>
+<script src="js/jsondiffpatch.min.js"></script>
+<script src="js/xxhash.min.js"></script>
+<script src="js/sifter.min.js"></script>
+<script src="js/jquery.fft.min.js"></script>
+<script src="js/leastsquare.min.js"></script>
+<script src="js/jquery.smartWizard.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/index.js"></script>
+<!-- <script src="bundle.js"></script> -->
+
