@@ -1,14 +1,23 @@
 {
-  "development":{
+    "development":
+    {
 
-  },
-  "standalone":{
-  	"standalone": true
-  },
-  "standalone-with-ssl":{
-    "standalone": true,
-  	"ssl": true,
-  	"sslkey":"./node/ssl.key",
-  	"sslcert":"./node/ssl.crt"
-  }
+    },
+    "production":
+    {
+        "standalone": true,
+        "ssl": false,
+        "port": 3002
+    },
+    "standalone":
+    {
+        "standalone": true
+    },
+    "standalone-with-ssl":
+    {
+        "standalone": true,
+        "ssl": true,
+        "sslkey": "./node/ssl.key",
+        "sslcert": "./node/ssl.crt"
+    }
 }

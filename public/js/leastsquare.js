@@ -1,1 +1,87 @@
-!function(t,e){"use strict";"function"==typeof define&&define.amd?define(e):"object"==typeof exports?module.exports=e():t.LeastSquares=e()}(this,function(){var t=function(t){return this.initialize.apply(this,arguments),this};return t.VERSION="1.0",t.prototype.initialize=function(t){this.sample=t||{}},t.prototype.getSlope=function(){for(var t,e,i=this.sample.length,s=0,n=0,p=0,o=0,r=0;r<i;r++)s+=(t=this.sample[r].x)*(e=this.sample[r].y),n+=t,p+=e,o+=t*t;return(i*s-n*p)/(i*o-n*n)},t.prototype.getIntercept=function(){for(var t,e,i=this.sample.length,s=0,n=0,p=0,o=0,r=0;r<i;r++)s+=(t=this.sample[r].x)*(e=this.sample[r].y),n+=t,p+=e,o+=t*t;return(o*p-s*n)/(i*o-n*n)},t.prototype.getSD=function(){for(var t,e,i=this.sample.length,s=0,n=this.getSlope(),p=this.getIntercept(),o=0;o<i;o++)t=this.sample[o].x,e=this.sample[o].y,s+=Math.pow(e-(n*t+p),2);return s/=i,Math.sqrt(s)},t});
+/*
+ * LeastSquares (leastsquares.js)
+ * 
+ */
+;(function(root, factory) {
+    'use strict';
+    if (typeof define === 'function' && define.amd) {
+        define(factory);
+    } else if (typeof exports === 'object') {
+        module.exports = factory();
+    } else {
+        root.LeastSquares = factory();
+    }
+}(this, function(){
+
+    var LeastSquares = function(sample) {
+        this.initialize.apply(this, arguments);
+        return this;
+    };
+
+    LeastSquares.VERSION = '1.0';
+
+    LeastSquares.prototype.initialize = function(sample) {
+        this.sample = sample || {};
+    };
+
+    LeastSquares.prototype.getSlope = function() {
+        var n = this.sample.length;
+        var sigmaXY = 0;
+        var sigmaX = 0;
+        var sigmaY = 0;
+        var sigmaXSquare = 0;
+        var x;
+        var y;
+        for (var i = 0; i < n; i++) {
+            x = this.sample[i].x;
+            y = this.sample[i].y;
+            sigmaXY += x * y;
+            sigmaX += x;
+            sigmaY += y;
+            sigmaXSquare += x * x;
+        }
+        return (n * sigmaXY - sigmaX * sigmaY)
+               / ((n * sigmaXSquare) - sigmaX * sigmaX);
+    };
+
+    LeastSquares.prototype.getIntercept = function() {
+        var n = this.sample.length;
+        var sigmaXY = 0;
+        var sigmaX = 0;
+        var sigmaY = 0;
+        var sigmaXSquare = 0;
+        var x;
+        var y;
+        for (var i = 0; i < n; i++) {
+            x = this.sample[i].x;
+            y = this.sample[i].y;
+            sigmaXY += x * y;
+            sigmaX += x;
+            sigmaY += y;
+            sigmaXSquare += x * x;
+        }
+            return (sigmaXSquare * sigmaY - sigmaXY * sigmaX) 
+                　　/ ((n * sigmaXSquare) - sigmaX * sigmaX);
+    };
+
+    LeastSquares.prototype.getSD = function() {
+        var n = this.sample.length;
+        var x;
+        var y;
+        var variance = 0;
+        var sD;
+        var slope = this.getSlope();
+        var intercept = this.getIntercept();
+        for (var i = 0; i < n; i++) {
+            x = this.sample[i].x;
+            y = this.sample[i].y;
+            variance += Math.pow(y - (slope * x + intercept), 2);
+        }
+        variance /= n;
+        sD = Math.sqrt(variance);
+        
+        return sD;
+    };
+
+    return LeastSquares;
+}));

@@ -21,10 +21,11 @@
 /*global define, root, CanvasJS */
 
 /* for debugging */
-var DEBUG = DEBUG || true;
+var DEBUG = DEBUG || false;
 var CONSOLE_DUMP_TIME = CONSOLE_DUMP_TIME || true;
-var DEBUG_TO_CONSOLE = DEBUG_TO_CONSOLE || true;
+var DEBUG_TO_CONSOLE = DEBUG_TO_CONSOLE || false;
 var REALTIME_UPDATE = REALTIME_UPDATE || true;
+var SERVER_PORT = SERVER_PORT || undefined;
 
 
 //for CommonJS
@@ -270,7 +271,7 @@ var REALTIME_UPDATE = REALTIME_UPDATE || true;
     var socketopts = {
         "reconnectionAttempts": 100
     };
-    var SERVERPORT = 3002;
+
     if (CONSOLE_DUMP_TIME) {
         console.timeEnd("ids");
     }
@@ -4158,7 +4159,7 @@ var REALTIME_UPDATE = REALTIME_UPDATE || true;
 
     if (REALTIME_UPDATE) {
 
-        port = SERVERPORT || location.port;
+        port = SERVER_PORT || location.port;
         socket = io.connect(
             "//" + location.hostname + ":" + port + "/",
             socketopts

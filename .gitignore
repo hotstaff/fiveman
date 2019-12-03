@@ -11,6 +11,7 @@ public/css/*
 node/ssl.key
 node/ssl.crt
 node/ssl.csr
+npm-debug.log
 
 !book/
 !logs/
