@@ -1,4 +1,6 @@
-FROM node:10
+FROM node:10-alpine
+RUN apk --update add git bash
+
 WORKDIR /usr/src/app
 COPY package.json ./
 COPY gulpfile.js ./
