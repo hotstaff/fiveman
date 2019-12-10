@@ -6,12 +6,12 @@ services:
       - app
     ports:
       - "80:80"
-    links:
-      - app:app
     volumes:
       - ./docker-nginx.conf:/etc/nginx/conf.d/default.conf
       - fiveman_public:/var/www/public:ro
       - fiveman_book:/var/www/book:ro
+    networks:
+      internal:
   app:
     build: .
     environment:
@@ -21,6 +21,13 @@ services:
     volumes:
       - fiveman_public:/usr/src/app/public
       - fiveman_book:/usr/src/app/book
+    networks:
+      internal:
+        aliases:
+          - app
 volumes:
   fiveman_public:
   fiveman_book:
+
+networks:
+  internal:
