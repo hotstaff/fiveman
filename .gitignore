@@ -12,6 +12,6 @@ node/ssl.key
 node/ssl.crt
 node/ssl.csr
 npm-debug.log
-
+book/note.json
 !book/
 !logs/

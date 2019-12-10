@@ -1,8 +1,4 @@
-/*jslint node: true */
-/*jslint sub: true */
-/*jslint stupid: true */
-/*jslint nomen: true */
-/*global note: true */
+/*jslint node: true, for */
 
 "use strict";
 
@@ -44,7 +40,7 @@ var readJsonSync = function readJsonSync(fname) {
         }
     }
     return json;
-}
+};
 
 // config
 var Familydesk = Familydesk || {};
@@ -59,8 +55,13 @@ Familydesk.ssl = config.ssl || false;
 Familydesk.sslkey = config.sslkey || null;
 Familydesk.sslcert = config.sslcert || null;
 Familydesk.sslca = config.sslca || null;
+
+// convert bool
+Familydesk.standalone = String(Familydesk.standalone) === "true";
+Familydesk.ssl = String(Familydesk.ssl) === "true";
+
 var server;
-if (Familydesk.ssl === true) {
+if (Familydesk.ssl) {
     if (Familydesk.sslkey === null || Familydesk.sslcert === null) {
         console.log("SSL configuration Error.");
         process.exit(1);
@@ -68,10 +69,10 @@ if (Familydesk.ssl === true) {
         var credentials;
         try {
             Familydesk.sslkey = fs.readFileSync(Familydesk.sslkey).toString();
-            Familydesk.sslcert =  fs.readFileSync(Familydesk.sslcert).toString();
+            Familydesk.sslcert = fs.readFileSync(Familydesk.sslcert).toString();
             credentials = {key: Familydesk.sslkey, cert: Familydesk.sslcert};
             if (Familydesk.sslca !== null) {
-                Familydesk.sslca =  fs.readFileSync(Familydesk.sslca).toString();
+                Familydesk.sslca = fs.readFileSync(Familydesk.sslca).toString();
                 credentials.ca =  Familydesk.sslca;
             }
             server = require("https").Server(credentials, app);
@@ -99,27 +100,27 @@ if (Familydesk.standalone) {
 server.listen(Familydesk.port, function () {
     var banner = `************************
 Starting Familydesk
-Mode: ${Familydesk.standalone ? "Standalone" : "Normal"} ${ Familydesk.ssl ? "\nSSL: on" : ""}
+Mode: ${(Familydesk.standalone ? "Standalone" : "Normal")}${(Familydesk.ssl ? "\nSSL: on" : "")}
 ************************
 Server listening at port *:${parseInt(Familydesk.port)} `;
-    console.log(banner)
+    console.log(banner);
 });
 
 function formatDate(date) {
     function addZero(n) {
-        return n < 10 ? "0" + n : "" + n;
+        return (n < 10 ? "0" + n : "" + n);
     }
-    var YYYY = date.getFullYear(),
-        MM = addZero(date.getMonth() + 1),
-        DD = addZero(date.getDate());
+    var YYYY = date.getFullYear();
+    var MM = addZero(date.getMonth() + 1);
+    var DD = addZero(date.getDate());
     return YYYY + "/" + MM + "/" + DD;
 }
 
 function compareTableDate(a, b) {
-    var adate = new Date(a['date']),
-        bdate = new Date(b['date']),
-        asysdate = new Date(a['sysdate']),
-        bsysdate = new Date(b['sysdate']);
+    var adate = new Date(a.date);
+    var bdate = new Date(b.date);
+    var asysdate = new Date(a.sysdate);
+    var bsysdate = new Date(b.sysdate);
 
     if (adate > bdate) { return 1; }
     if (adate < bdate) { return -1; }
@@ -134,7 +135,7 @@ function addQueue(queue) {
     var row = note.table.length;
     while (row--) {
         if (compareTableDate(queue, note.table[row]) > 0) {
-            row++;
+            row += 1;
             break;
         }
     }
@@ -153,19 +154,20 @@ function writeNote() {
         if (err) {
             throw err;
         }
-        console.log("write note at " + new Date() + ", hash -> " + getTableHash());
+        console.log("write note at " + new Date()
+                    + ", hash -> " + getTableHash());
     });
 }
 
 function deltaIn() {
-    var str = JSON.stringify(note.table),
-        hash = XXH.h32(str, SEED).toString(16);
-    return {hash: hash, oldtable: JSON.parse(str)};
+    var str = JSON.stringify(note.table);
+    var hash = XXH.h32(str, SEED).toString(16);
+    return {hash, oldtable: JSON.parse(str)};
 }
 
 function deltaOut(deltain, stacked) {
-    var delta = jsondiffpatch.diff(deltain.oldtable, note.table),
-        hashdelta = {hash: deltain.hash, delta: delta};
+    var delta = jsondiffpatch.diff(deltain.oldtable, note.table);
+    var hashdelta = {hash: deltain.hash, delta};
     if (stacked !== undefined) {
         if (stacked === false) {
             return hashdelta;
@@ -176,10 +178,10 @@ function deltaOut(deltain, stacked) {
 }
 
 function inTable(queue) {
-    var row,
-        l = note.table.length;
+    var row;
+    var l = note.table.length;
     for (row = 0; row < l; row = row + 1) {
-        if (queue['uuid'] === note.table[row]['uuid']) {
+        if (queue.uuid === note.table[row].uuid) {
             return row;
         }
     }
@@ -201,12 +203,11 @@ if (note === null) {
             },
             "refferencedate": 1
         },
-        "table": [
-        ]
-    }
+        "table": []
+    };
     console.log("Note not found. Initial blank note.json loaded.\n" +
                 "Please edit book/note.json after write first item.");
-    writeNote()
+    writeNote();
 }
 
 var chatlog = readJsonSync(Familydesk.bookdir + Familydesk.chatfilename);
@@ -222,7 +223,10 @@ var stack = [];
 var deltastack = [];
 var uuidrow = {};
 
-
+process.on("SIGTERM", function() {
+     console.log("Got SIGTERM. ");
+     process.exit(128+15);
+});
 
 // table sort
 // This process take a while.
@@ -232,10 +236,13 @@ var io = require("socket.io").listen(server);
 
 io.sockets.on("connection", function (socket) {
     var UUID = uuidv4().substr(0, 8);
-    socket.emit("info", { text: "info: connection confirmed (" + UUID + ")", userid: UUID });
+    socket.emit("info",
+                {
+                    text: "info: connection confirmed (" + UUID + ")",
+                    userid: UUID
+                });
     io.sockets.emit("msg", { text: "ようこそ " + UUID, userid: "Server" });
     io.sockets.emit("chatlog", chatlog);
-    // console.log('New connection from ' + socket.request.connection.remoteAddress + ':' + socket.request.connection.remotePort);
 
     socket.on("msg", function (data) {
         var msg = { text: data.text, userid: data.userid };
@@ -243,26 +250,29 @@ io.sockets.on("connection", function (socket) {
         // chatlog write
         chatlog.push(msg);
         var str = JSON.stringify(chatlog, null, "    ");
-        fs.writeFile(Familydesk.bookdir + Familydesk.chatfilename, str, function (err) {
+        fs.writeFile(Familydesk.bookdir + Familydesk.chatfilename,
+                     str,
+                     function (err) {
             console.log(err);
         });
     });
 
     socket.on("input", function (data) {
         //for delta
-        var deltain = deltaIn(),
-            queues = data;
+        var deltain = deltaIn();
+        var queues = data;
         if (Array.isArray(queues)) {
-            var i,
-                l = queues.length;
+            var i;
+            var l = queues.length;
             for (i = 0; i < l; i = i + 1) {
-                queues[i]['uuid'] = uuidv1();
+                queues[i].uuid = uuidv1();
                 addQueue(queues[i]);
                 stack.push(queues[i]);
             }
-        } else if (typeof queues === 'object' || queues['sysdate'] !== undefined) {
+        } else if (typeof queues === "object"
+                   || queues.sysdate !== undefined) {
             //single
-            queues['uuid'] = uuidv1();
+            queues.uuid = uuidv1();
             addQueue(queues);
             stack.push(queues);
         } else {
@@ -276,8 +286,8 @@ io.sockets.on("connection", function (socket) {
 
     socket.on("edit", function (data) {
         //for delta
-        var deltain = deltaIn(),
-            row = inTable(data);
+        var deltain = deltaIn();
+        var row = inTable(data);
         if (row > 0) {
             note.table.splice(row, 1);
             addQueue(data);
@@ -300,9 +310,9 @@ io.sockets.on("connection", function (socket) {
         }
     });
 
-    socket.on('hash', function (data) {
-        var hash = data,
-            i = deltastack.length;
+    socket.on("hash", function (data) {
+        var hash = data;
+        var i = deltastack.length;
         while (i--) {
             if (deltastack[i].hash === hash) {
                 break;
@@ -311,19 +321,19 @@ io.sockets.on("connection", function (socket) {
 
         if (i < 0) {
             if (hash === getTableHash()) {
-                console.log('request:' + hash + ' -> hash is the latest.');
+                console.log("request:" + hash + " -> hash is the latest.");
                 return 1;
             }
-            socket.emit('note', note);
-            console.log('request:' + hash + ' -> hash is not found.');
+            socket.emit("note", note);
+            console.log("request:" + hash + " -> hash is not found.");
             return 1;
         }
 
-        socket.emit('delta', deltastack.slice(i));
-        console.log('request:' + hash + ' -> answer ' + i + ' deltas.');
+        socket.emit("delta", deltastack.slice(i));
+        console.log("request:" + hash + " -> answer " + i + " deltas.");
     });
 
-    socket.on('disconnect', function () {
-        io.sockets.emit('msg', { text: 'bye ' + UUID, userid: 'Server' });
+    socket.on("disconnect", function () {
+        io.sockets.emit("msg", { text: "bye " + UUID, userid: "Server" });
     });
 });

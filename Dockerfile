@@ -10,7 +10,9 @@ COPY public/js/leastsquare.js ./public/js/
 RUN npm install -p --unsafe-perm
 COPY . .
 
+ARG STANDALONE
+ENV STANDALONE ${STANDALONE:-true}
 ARG PORT
 ENV PORT ${PORT:-3002}
 EXPOSE $PORT
-CMD ["npm", "run", "test"]
+CMD ["node", "node/familydesk.js"]

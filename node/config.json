@@ -5,13 +5,13 @@
     },
     "production":
     {
-        "standalone": true,
+        "standalone": false,
         "ssl": false,
         "port": 3002
     },
     "standalone":
-    {
-        "standalone": true
+    {	
+	"standalone": true
     },
     "standalone-with-ssl":
     {
