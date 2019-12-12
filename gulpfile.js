@@ -11,7 +11,6 @@ var del = require('del');
 var uglify = require('gulp-uglify');
 var cleanCSS = require('gulp-clean-css');
 var rename = require("gulp-rename");
-var runSequence = require('run-sequence');
 
 // js
 var public_js_dir = "./public/js";
@@ -63,7 +62,7 @@ gulp.task("clean:fonts", function () {
     return del(["./public/fonts/*"]);
 });
 
-gulp.task('clean', ["clean:js", "clean:css", "clean:fonts"]);
+gulp.task('clean', gulp.parallel("clean:js", "clean:css", "clean:fonts"));
 
 gulp.task('copy:js', function () {
     return gulp.src(required_modules)
@@ -85,7 +84,7 @@ gulp.task('copy:fonts', function () {
                .pipe(gulp.dest(public_fonts_dir));
 });
 
-gulp.task('copy', ["copy:js", "copy:remote_js", "copy:css", "copy:fonts"]);
+gulp.task('copy', gulp.parallel("copy:js", "copy:remote_js", "copy:css", "copy:fonts"));
 
 gulp.task('minify:js', function () {
     return gulp.src(["./public/js/*.js", "!./public/js/*.min.js"])
@@ -102,8 +101,6 @@ gulp.task('minify:css', function () {
                .pipe(gulp.dest('./public/css'));
 });
 
-gulp.task('minify', ["minify:css", "minify:js"]);
+gulp.task('minify', gulp.parallel("minify:css", "minify:js"));
 
-gulp.task('default', function (callback) {
-    return runSequence('copy', 'minify', callback);
-});
+gulp.task('default', gulp.series('copy', 'minify'));

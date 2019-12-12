@@ -1,0 +1,27 @@
+LICENCE
+
+This household account book is released under the Apache-2.0 license.
+This household account book includes source code published under MIT, Apache-2.0, CC BY-NC3.0 licenses. You can check the list of licenses for each code from public/js/index.js. Canvas.js is currently released under a commercial license, but this household account book uses the old CC BY-NC 3.0. So this house
+Books are not commercially available.
+
+Below is a list of javascript plug-ins and licenses used.
+
+//MIT
+jquery
+socket.io-client
+flatpickr
+js-cookie
+jsondiffpatch
+xxhashjs
+devbridge-autocomplete
+smartwizard
+
+leastsquare.js
+jquery.fft
+
+//Apache-2.0
+pnotify
+sifter
+
+//CC BY-NC 3.0
+canvasjs.js

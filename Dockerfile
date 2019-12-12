@@ -7,7 +7,7 @@ COPY gulpfile.js ./
 COPY public/js/index.js ./public/js/
 COPY public/js/leastsquare.js ./public/js/
 
-RUN npm install -p --unsafe-perm
+RUN npm install -p --unsafe-perm --no-optional
 COPY . .
 
 ARG STANDALONE
