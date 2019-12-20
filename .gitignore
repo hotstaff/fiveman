@@ -1,6 +1,7 @@
 node_modules/
 public/bundle.js
 public/bundle.js.map
+public/fonts/*
 !public/fonts/
 public/css/*
 public/js/*
