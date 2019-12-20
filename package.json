@@ -1,6 +1,6 @@
 {
   "name": "fiveman",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Real-time kakeibo.",
   "main": "js/index.js",
   "dependencies": {

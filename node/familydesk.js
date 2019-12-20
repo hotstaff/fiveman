@@ -84,7 +84,7 @@ if (Familydesk.ssl) {
     server = require("http").Server(app);
 }
 
-app.get("/", function (req, res) {
+app.get("/status", function (req, res) {
     res.writeHead(200, { "Content-Type": "tObjecttml" });
     res.write("*************************\n");
     res.write(" Welcome to fiveman !!\n");
@@ -92,7 +92,7 @@ app.get("/", function (req, res) {
 });
 if (Familydesk.standalone) {
     app.use(compression({level: 8}));
-    app.use("/public", express.static(__dirname + "/../public"));
+    app.use("/", express.static(__dirname + "/../public"));
     app.use("/book", express.static(Familydesk.bookdir));
 }
 
