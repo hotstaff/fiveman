@@ -1,17 +1,11 @@
 {
     "development":
     {
-
+        "standalone": true
     },
     "production":
     {
-        "standalone": false,
-        "ssl": false,
-        "port": 3002
-    },
-    "standalone":
-    {	
-	"standalone": true
+        "standalone": true
     },
     "standalone-with-ssl":
     {
@@ -19,5 +13,15 @@
         "ssl": true,
         "sslkey": "./node/ssl.key",
         "sslcert": "./node/ssl.crt"
+    },
+    "custom":{
+        "port": 3002,
+        "standalone": false,
+        "filename": "note.json",
+        "chatfilename": "chat.json",
+        "ssl": false,
+        "sslkey": null,
+        "sslcert": null,
+        "sslca": null
     }
 }

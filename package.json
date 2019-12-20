@@ -44,10 +44,11 @@
   "readme": "ERROR: No README data found!",
   "scripts": {
     "postinstall": "gulp",
-    "test": "NODE_ENV=standalone node node/familydesk.js",
-    "start": "NODE_ENV=standalone forever start --minUptime 1000 --spinSleepTime 1000 -o logs/familydesk.log node/familydesk.js ",
+    "clean": "gulp clean",
+    "test": "NODE_ENV=development node node/familydesk.js",
+    "start": "NODE_ENV=production forever start --minUptime 1000 --spinSleepTime 1000 -o logs/familydesk.log node/familydesk.js ",
     "start-with-ssl": "NODE_ENV=standalone-with-ssl forever start --minUptime 1000 --spinSleepTime 1000 -o logs/familydesk.log node/familydesk.js",
-    "start-without-express": "forever start --minUptime 1000 --spinSleepTime 1000 -o logs/familydesk.log node/familydesk.js",
+    "start-without-express": "NODE_ENV=production STANDALONE=false forever start --minUptime 1000 --spinSleepTime 1000 -o logs/familydesk.log node/familydesk.js",
     "stop": "forever stop node/familydesk.js",
     "build-test": "webpack --devtool source-map",
     "build": "webpack -p --optimize-minimize --profile"
