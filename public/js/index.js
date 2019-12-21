@@ -2899,6 +2899,14 @@ var SERVER_PORT = SERVER_PORT || undefined;
             return false;
         });
 
+        $connectionstatusicon.off("click").on("click", function () {
+            setTimeout(function(){
+                requestNoteByAjax(false);
+                showNotify("info", "手動更新",
+                    　　"全件のデータを再取得しました");
+            }, 0);
+        });
+
 
         $chartline.off("shown.bs.tab").on("shown.bs.tab", function () {
             NOTE.plotGraph();
@@ -4098,7 +4106,7 @@ var SERVER_PORT = SERVER_PORT || undefined;
         }
         $.ajax({
             url: "./../book/note.json",
-            cache: cache || true,
+            cache: (cache ? true : false),
             dataType: "json"
         }).done(function (note) {
             recievedNote(note);
