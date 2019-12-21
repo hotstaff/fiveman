@@ -3803,6 +3803,7 @@ var SERVER_PORT = SERVER_PORT || undefined;
                     "新規のノート",
                     "初期品目を登録をしてください"
                 );
+                fivemanCommand("fiveman");
                 setQueue(__initial_queue);
             }, 0);
         }
