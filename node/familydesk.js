@@ -219,7 +219,6 @@ if (chatlog === null) {
     console.log("Chatlog not found. Initial chat.json loaded." );
 }
 
-var stack = [];
 var deltastack = [];
 var uuidrow = {};
 
@@ -267,14 +266,12 @@ io.sockets.on("connection", function (socket) {
             for (i = 0; i < l; i = i + 1) {
                 queues[i].uuid = uuidv1();
                 addQueue(queues[i]);
-                stack.push(queues[i]);
             }
         } else if (typeof queues === "object"
                    || queues.sysdate !== undefined) {
             //single
             queues.uuid = uuidv1();
             addQueue(queues);
-            stack.push(queues);
         } else {
             return false;
         }
