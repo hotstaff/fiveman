@@ -162,6 +162,7 @@ var SERVER_PORT = SERVER_PORT || undefined;
     var $buttonfuture = $("#buttonfuture");
     var $buttonpast = $("#buttonpast");
     var $buttonall = $("#buttonall");
+    var $buttonlastthreemonth = $("#buttonlastthreemonth");
     var $buttonprevious = $("#buttonprevious");
     var $buttonnext = $("#buttonnext");
     /**/
@@ -1408,6 +1409,10 @@ var SERVER_PORT = SERVER_PORT || undefined;
         case "lastweek":
             begindate = lastweekrefdate;
             enddate = sysDate;
+            break;
+        case "lastthreemonth":
+            begindate = getMonthReferenceDate(sysDate, -2, ref, "begin");
+            enddate = sysDate
             break;
         case "free":
             begindate = kikancalender.selectedDates[0];
@@ -3094,6 +3099,11 @@ var SERVER_PORT = SERVER_PORT || undefined;
 
         $buttonall.off("click").on("click", function () {
             NOTE.switchKikan("all");
+            return false;
+        });
+
+        $buttonlastthreemonth.off("click").on("click", function () {
+            NOTE.switchKikan("lastthreemonth");
             return false;
         });
 
